@@ -1,0 +1,55 @@
+/* Styles complementaires a Bootstrap */
+
+.stat-card .display-6 {
+    font-size: 2rem;
+    font-weight: 600;
+}
+
+.badge {
+    font-weight: 500;
+}
+
+/* Badges de statut de stage */
+.statut-EN_ATTENTE {
+    background-color: #ffc107;
+    color: #212529;
+}
+
+.statut-EN_COURS {
+    background-color: #0d6efd;
+    color: #ffffff;
+}
+
+.statut-TERMINE {
+    background-color: #6c757d;
+    color: #ffffff;
+}
+
+.statut-VALIDE {
+    background-color: #198754;
+    color: #ffffff;
+}
+
+/* Badges de statut d'etape */
+.etape-A_FAIRE {
+    background-color: #e9ecef;
+    color: #495057;
+}
+
+.etape-EN_COURS {
+    background-color: #0d6efd;
+    color: #ffffff;
+}
+
+.etape-VALIDEE {
+    background-color: #198754;
+    color: #ffffff;
+}
+
+.table > :not(caption) > * > * {
+    vertical-align: middle;
+}
+
+.navbar-brand {
+    letter-spacing: 0.02em;
+}

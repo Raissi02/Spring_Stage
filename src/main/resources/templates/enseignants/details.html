@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}"
+      lang="fr">
+<head>
+    <title>Enseignant</title>
+</head>
+<body>
+<div layout:fragment="content">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1 class="h3 mb-0" th:text="${enseignant.nomComplet}">Enseignant</h1>
+        <div class="d-flex gap-2">
+            <a class="btn btn-outline-secondary" th:href="@{/enseignants/{id}/edit(id=${enseignant.id})}">Modifier</a>
+            <a class="btn btn-outline-secondary" th:href="@{/enseignants}">Retour</a>
+        </div>
+    </div>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-white fw-semibold">Informations</div>
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <span class="text-muted small d-block">Email</span>
+                    <span th:text="${enseignant.email}">email</span>
+                </div>
+                <div class="col-md-4">
+                    <span class="text-muted small d-block">Grade</span>
+                    <span th:text="${enseignant.grade}">grade</span>
+                </div>
+                <div class="col-md-4">
+                    <span class="text-muted small d-block">Specialite</span>
+                    <span th:text="${enseignant.specialite}">specialite</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-header bg-white fw-semibold">Etudiants affectes</div>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                <tr>
+                    <th>Etudiant</th>
+                    <th>Filiere / niveau</th>
+                    <th>Stage</th>
+                    <th>Statut du stage</th>
+                    <th class="text-end">Avancement</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="e : ${etudiants}">
+                    <td><a th:href="@{/etudiants/{id}(id=${e.id})}" th:text="${e.nomComplet}">Nom</a></td>
+                    <td th:text="|${e.filiere} / ${e.niveau}|">GL / 3</td>
+                    <td>
+                        <a th:if="${e.stage != null}" th:href="@{/stages/{id}(id=${e.stage.id})}"
+                           th:text="${e.stage.sujet}">Stage</a>
+                        <span th:if="${e.stage == null}" class="text-muted">&mdash;</span>
+                    </td>
+                    <td>
+                        <span th:if="${e.stage != null}" class="badge"
+                              th:classappend="|statut-${e.stage.statut.name()}|"
+                              th:text="${e.stage.statut.label}">Statut</span>
+                        <span th:if="${e.stage == null}" class="text-muted">&mdash;</span>
+                    </td>
+                    <td class="text-end" th:text="${e.stage != null ? e.stage.avancement + '%' : '-'}">0%</td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(etudiants)}">
+                    <td colspan="5" class="text-center text-muted py-4">Aucun etudiant affecte.</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}"
+      lang="fr">
+<head>
+    <title>Espace enseignant</title>
+</head>
+<body>
+<div layout:fragment="content">
+
+    <div class="mb-4">
+        <span class="badge text-bg-primary mb-1">Espace enseignant</span>
+        <h1 class="h3 mb-1">Choisir un enseignant</h1>
+        <p class="text-muted mb-0">
+            Selectionnez votre profil pour acceder a vos etudiants et au suivi des stages.
+        </p>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                <tr>
+                    <th>Enseignant</th>
+                    <th>Grade</th>
+                    <th>Specialite</th>
+                    <th class="text-center">Etudiants encadres</th>
+                    <th class="text-end">Action</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="e : ${enseignants}">
+                    <td th:text="${e.nomComplet}">Enseignant</td>
+                    <td th:text="${e.grade}">Grade</td>
+                    <td th:text="${e.specialite}">Specialite</td>
+                    <td class="text-center" th:text="${e.etudiants.size()}">0</td>
+                    <td class="text-end">
+                        <a class="btn btn-sm btn-primary"
+                           th:href="@{/enseignant/{id}(id=${e.id})}">Ouvrir l'espace</a>
+                    </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(enseignants)}">
+                    <td colspan="5" class="text-center text-muted py-4">Aucun enseignant enregistre.</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="mt-3">
+        <a class="btn btn-outline-secondary btn-sm" th:href="@{/}">Retour a l'accueil</a>
+    </div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,38 @@
+services:
+
+  mysql:
+    image: mysql:8.4
+    container_name: stages-mysql
+    environment:
+      MYSQL_DATABASE: stages
+      MYSQL_USER: stages
+      MYSQL_PASSWORD: stages
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u root -proot --silent"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  app:
+    build: .
+    container_name: stages-app
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: stages
+      DB_USER: stages
+      DB_PASSWORD: stages
+    ports:
+      - "8080:8080"
+
+volumes:
+  mysql-data:

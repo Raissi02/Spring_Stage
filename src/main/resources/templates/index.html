@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}"
+      lang="fr">
+<head>
+    <title>Tableau de bord</title>
+</head>
+<body>
+<div layout:fragment="content">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <span class="badge text-bg-dark mb-1">Espace administrateur</span>
+            <h1 class="h3 mb-0">Tableau de bord</h1>
+        </div>
+        <a class="btn btn-primary" th:href="@{/stages/new}">Nouveau stage</a>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-lg-3">
+            <div class="card shadow-sm h-100 stat-card">
+                <div class="card-body">
+                    <div class="text-muted text-uppercase small">Etudiants</div>
+                    <div class="display-6" th:text="${stats.totalEtudiants()}">0</div>
+                    <div class="small text-muted">
+                        dont <span th:text="${stats.etudiantsSansEncadrant()}">0</span> sans encadrant
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="card shadow-sm h-100 stat-card">
+                <div class="card-body">
+                    <div class="text-muted text-uppercase small">Enseignants</div>
+                    <div class="display-6" th:text="${stats.totalEnseignants()}">0</div>
+                    <div class="small text-muted">encadrants pedagogiques</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="card shadow-sm h-100 stat-card">
+                <div class="card-body">
+                    <div class="text-muted text-uppercase small">Entreprises</div>
+                    <div class="display-6" th:text="${stats.totalEntreprises()}">0</div>
+                    <div class="small text-muted">partenaires d'accueil</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="card shadow-sm h-100 stat-card">
+                <div class="card-body">
+                    <div class="text-muted text-uppercase small">Stages</div>
+                    <div class="display-6" th:text="${stats.totalStages()}">0</div>
+                    <div class="small text-muted">
+                        <span th:text="${stats.etapesValidees()}">0</span> /
+                        <span th:text="${stats.totalEtapes()}">0</span> etapes validees
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-lg-5">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-white fw-semibold">Repartition des stages par statut</div>
+                <div class="table-responsive">
+                    <table class="table table-sm mb-0">
+                        <thead class="table-light">
+                        <tr><th>Statut</th><th class="text-end">Nombre</th></tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="ligne : ${stats.stagesParStatut()}">
+                            <td th:text="${ligne.key}">EN COURS</td>
+                            <td class="text-end" th:text="${ligne.value}">0</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-7">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-white fw-semibold">Stages par entreprise d'accueil</div>
+                <div class="table-responsive">
+                    <table class="table table-sm mb-0">
+                        <thead class="table-light">
+                        <tr><th>Entreprise</th><th class="text-end">Nombre de stages</th></tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="ligne : ${stats.stagesParEntreprise()}">
+                            <td th:text="${ligne.entreprise()}">Entreprise</td>
+                            <td class="text-end" th:text="${ligne.nombre()}">0</td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(stats.stagesParEntreprise())}">
+                            <td colspan="2" class="text-center text-muted py-3">Aucune donnee.</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+            <span class="fw-semibold">Stages recents</span>
+            <a class="btn btn-sm btn-outline-secondary" th:href="@{/stages}">Tout voir</a>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                <tr>
+                    <th>Sujet</th>
+                    <th>Entreprise</th>
+                    <th>Etudiant</th>
+                    <th>Periode</th>
+                    <th>Statut</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="s : ${stages}">
+                    <td><a th:href="@{/stages/{id}(id=${s.id})}" th:text="${s.sujet}">Sujet</a></td>
+                    <td th:text="${s.entreprise.raisonSociale}">Entreprise</td>
+                    <td th:text="${s.etudiant != null ? s.etudiant.nomComplet : '-'}">Etudiant</td>
+                    <td>
+                        <span th:text="${s.dateDebut}">2026-01-01</span>
+                        &rarr;
+                        <span th:text="${s.dateFin}">2026-06-30</span>
+                    </td>
+                    <td>
+                        <span class="badge" th:classappend="|statut-${s.statut.name()}|"
+                              th:text="${s.statut.label}">EN COURS</span>
+                    </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(stages)}">
+                    <td colspan="5" class="text-center text-muted py-4">Aucun stage enregistre.</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}"
+      lang="fr">
+<head>
+    <title>Stages</title>
+</head>
+<body>
+<div layout:fragment="content">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1 class="h3 mb-0">Stages</h1>
+        <a class="btn btn-primary" th:href="@{/stages/new}">Nouveau stage</a>
+    </div>
+
+    <form class="row g-2 mb-3" method="get" th:action="@{/stages}">
+        <div class="col-sm-5 col-md-4">
+            <input class="form-control" type="text" name="sujet" th:value="${sujet}"
+                   placeholder="Sujet du stage">
+        </div>
+        <div class="col-sm-4 col-md-3">
+            <select class="form-select" name="statut">
+                <option value="">Tous les statuts</option>
+                <option th:each="st : ${statuts}" th:value="${st}" th:text="${st.label}"
+                        th:selected="${statutSelectionne != null and statutSelectionne == st}">
+                </option>
+            </select>
+        </div>
+        <div class="col-auto">
+            <button class="btn btn-outline-secondary">Filtrer</button>
+        </div>
+    </form>
+
+    <div class="card shadow-sm">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                <tr>
+                    <th>Sujet</th>
+                    <th>Entreprise</th>
+                    <th>Etudiant</th>
+                    <th>Periode</th>
+                    <th>Statut</th>
+                    <th style="min-width: 110px;">Avancement</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="s : ${stages}">
+                    <td><a th:href="@{/stages/{id}(id=${s.id})}" th:text="${s.sujet}">Sujet</a></td>
+                    <td th:text="${s.entreprise.raisonSociale}">Entreprise</td>
+                    <td>
+                        <a th:if="${s.etudiant != null}" th:href="@{/etudiants/{id}(id=${s.etudiant.id})}"
+                           th:text="${s.etudiant.nomComplet}">Etudiant</a>
+                        <span th:if="${s.etudiant == null}" class="text-muted">&mdash;</span>
+                    </td>
+                    <td class="text-nowrap">
+                        <span th:text="${s.dateDebut}">debut</span> &rarr;
+                        <span th:text="${s.dateFin}">fin</span>
+                    </td>
+                    <td>
+                        <span class="badge" th:classappend="|statut-${s.statut.name()}|"
+                              th:text="${s.statut.label}">Statut</span>
+                    </td>
+                    <td>
+                        <div class="progress" style="height: 6px;">
+                            <div class="progress-bar" th:style="|width: ${s.avancement}%|"></div>
+                        </div>
+                        <small class="text-muted" th:text="|${s.avancement}%|">0%</small>
+                    </td>
+                    <td class="text-end text-nowrap">
+                        <a class="btn btn-sm btn-outline-secondary"
+                           th:href="@{/stages/{id}(id=${s.id})}">Details</a>
+                        <a class="btn btn-sm btn-outline-secondary"
+                           th:href="@{/stages/{id}/edit(id=${s.id})}">Modifier</a>
+                        <form class="d-inline" method="post"
+                              th:action="@{/stages/{id}/delete(id=${s.id})}"
+                              onsubmit="return confirm('Supprimer ce stage et tout son suivi ?');">
+                            <button class="btn btn-sm btn-outline-danger">Supprimer</button>
+                        </form>
+                    </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(stages)}">
+                    <td colspan="7" class="text-center text-muted py-4">Aucun stage trouve.</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+</body>
+</html>

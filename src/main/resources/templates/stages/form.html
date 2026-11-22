@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}"
+      lang="fr">
+<head>
+    <title>Fiche stage</title>
+</head>
+<body>
+<div layout:fragment="content">
+
+    <h1 class="h3 mb-3"
+        th:text="${stage.id == null} ? 'Nouveau stage' : 'Modifier un stage'">Stage</h1>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <form method="post"
+                  th:action="${stage.id == null} ? @{/stages} : @{/stages/{id}(id=${stage.id})}"
+                  th:object="${stage}">
+
+                <div class="alert alert-danger" th:if="${#fields.hasGlobalErrors()}">
+                    <p class="mb-0" th:each="err : ${#fields.globalErrors()}" th:text="${err}">Erreur</p>
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-12">
+                        <label class="form-label" for="sujet">Sujet</label>
+                        <input class="form-control" id="sujet" type="text" th:field="*{sujet}">
+                        <div class="text-danger small" th:errors="*{sujet}"></div>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label" for="description">Description</label>
+                        <textarea class="form-control" id="description" rows="3"
+                                  th:field="*{description}"></textarea>
+                        <div class="text-danger small" th:errors="*{description}"></div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label" for="dateDebut">Date de debut</label>
+                        <input class="form-control" id="dateDebut" type="date" th:field="*{dateDebut}">
+                        <div class="text-danger small" th:errors="*{dateDebut}"></div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label" for="dateFin">Date de fin</label>
+                        <input class="form-control" id="dateFin" type="date" th:field="*{dateFin}">
+                        <div class="text-danger small" th:errors="*{dateFin}"></div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label" for="entrepriseId">Entreprise d'accueil</label>
+                        <select class="form-select" id="entrepriseId" name="entrepriseId" required>
+                            <option value="">-- Choisir --</option>
+                            <option th:each="ent : ${entreprises}"
+                                    th:value="${ent.id}"
+                                    th:text="${ent.raisonSociale}"
+                                    th:selected="${stage.entreprise != null and stage.entreprise.id == ent.id}">
+                            </option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label" for="etudiantId">Etudiant stagiaire</label>
+                        <select class="form-select" id="etudiantId" name="etudiantId">
+                            <option value="">-- Non affecte --</option>
+                            <option th:each="et : ${etudiants}"
+                                    th:value="${et.id}"
+                                    th:text="${et.nomComplet}"
+                                    th:selected="${stage.etudiant != null and stage.etudiant.id == et.id}">
+                            </option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label" for="statut">Statut</label>
+                        <select class="form-select" id="statut" th:field="*{statut}">
+                            <option th:each="st : ${statuts}" th:value="${st}" th:text="${st.label}"></option>
+                        </select>
+                        <div class="text-danger small" th:errors="*{statut}"></div>
+                    </div>
+                </div>
+
+                <div class="mt-4 d-flex gap-2">
+                    <button class="btn btn-primary" type="submit">Enregistrer</button>
+                    <a class="btn btn-outline-secondary" th:href="@{/stages}">Annuler</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</div>
+</body>
+</html>

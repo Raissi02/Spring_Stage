@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}"
+      lang="fr">
+<head>
+    <title>Accueil - Gestion des stages</title>
+</head>
+<body>
+<div layout:fragment="content">
+
+    <div class="text-center mb-5">
+        <h1 class="display-6 fw-semibold">Gestion des stages et du suivi des etudiants</h1>
+        <p class="lead text-muted mb-0">Choisissez l'espace correspondant a votre role.</p>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-body d-flex flex-column">
+                    <span class="badge text-bg-dark align-self-start mb-2">Administrateur</span>
+                    <h2 class="h5">Espace administration</h2>
+                    <ul class="small text-muted flex-grow-1 ps-3">
+                        <li>Gerer les etudiants et les enseignants</li>
+                        <li>Gerer les entreprises d'accueil</li>
+                        <li>Affecter les enseignants encadrants</li>
+                        <li>Consulter les stages et les statistiques</li>
+                    </ul>
+                    <a class="btn btn-dark" th:href="@{/admin}">Ouvrir l'espace admin</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-body d-flex flex-column">
+                    <span class="badge text-bg-primary align-self-start mb-2">Enseignant encadrant</span>
+                    <h2 class="h5">Espace enseignant</h2>
+                    <ul class="small text-muted flex-grow-1 ps-3">
+                        <li>Consulter les etudiants affectes</li>
+                        <li>Gerer les reunions de suivi</li>
+                        <li>Ajouter observations et recommandations</li>
+                        <li>Valider les etapes de progression</li>
+                    </ul>
+                    <a class="btn btn-primary" th:href="@{/enseignant}">Ouvrir l'espace enseignant</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-body d-flex flex-column">
+                    <span class="badge text-bg-success align-self-start mb-2">Etudiant stagiaire</span>
+                    <h2 class="h5">Espace etudiant</h2>
+                    <ul class="small text-muted flex-grow-1 ps-3">
+                        <li>Consulter les informations du stage</li>
+                        <li>Declarer l'avancement des travaux</li>
+                        <li>Deposer les livrables</li>
+                        <li>Lire les observations de l'encadrant</li>
+                    </ul>
+                    <a class="btn btn-success" th:href="@{/etudiant}">Ouvrir l'espace etudiant</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-3 mt-4">
+        <div class="col-6 col-lg-3">
+            <div class="card shadow-sm h-100 stat-card">
+                <div class="card-body">
+                    <div class="text-muted text-uppercase small">Etudiants</div>
+                    <div class="display-6" th:text="${stats.totalEtudiants()}">0</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="card shadow-sm h-100 stat-card">
+                <div class="card-body">
+                    <div class="text-muted text-uppercase small">Enseignants</div>
+                    <div class="display-6" th:text="${stats.totalEnseignants()}">0</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="card shadow-sm h-100 stat-card">
+                <div class="card-body">
+                    <div class="text-muted text-uppercase small">Stages</div>
+                    <div class="display-6" th:text="${stats.totalStages()}">0</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="card shadow-sm h-100 stat-card">
+                <div class="card-body">
+                    <div class="text-muted text-uppercase small">Etapes validees</div>
+                    <div class="display-6" th:text="${stats.etapesValidees()}">0</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <p class="text-muted small text-center mt-4 mb-0">
+        Les trois espaces sont accessibles sans authentification (hors perimetre du mini-projet).
+        Une interface CSR est disponible via l'API REST :
+        <a th:href="@{/csr/index.html}" target="_blank">interface CSR</a>.
+    </p>
+
+</div>
+</body>
+</html>

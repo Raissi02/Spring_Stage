@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}"
+      lang="fr">
+<head>
+    <title>Suivi du stage</title>
+</head>
+<body>
+<div layout:fragment="content">
+
+    <!-- ================= En-tete du stage ================= -->
+    <div class="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-3">
+        <div>
+            <h1 class="h3 mb-1" th:text="${stage.sujet}">Sujet du stage</h1>
+            <div class="text-muted">
+                <span th:text="${stage.entreprise.raisonSociale}">Entreprise</span>
+                &middot;
+                <a th:if="${stage.etudiant != null}"
+                   th:href="@{/etudiants/{id}(id=${stage.etudiant.id})}"
+                   th:text="${stage.etudiant.nomComplet}">Etudiant</a>
+                <span th:if="${stage.etudiant == null}" class="fst-italic">Etudiant non affecte</span>
+            </div>
+        </div>
+        <div class="d-flex gap-2">
+            <a class="btn btn-outline-secondary" th:href="@{/stages/{id}/edit(id=${stage.id})}">Modifier</a>
+            <form method="post" th:action="@{/stages/{id}/delete(id=${stage.id})}"
+                  onsubmit="return confirm('Supprimer ce stage et tout son suivi ?');">
+                <button class="btn btn-outline-danger">Supprimer</button>
+            </form>
+            <a class="btn btn-outline-secondary" th:href="@{/stages}">Retour</a>
+        </div>
+    </div>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <span class="text-muted small d-block">Periode</span>
+                    <span th:text="${stage.dateDebut}">debut</span> &rarr;
+                    <span th:text="${stage.dateFin}">fin</span>
+                </div>
+                <div class="col-md-2">
+                    <span class="text-muted small d-block">Duree</span>
+                    <span th:text="|${stage.dureeEnJours} jours|">0 jours</span>
+                </div>
+                <div class="col-md-3">
+                    <span class="text-muted small d-block">Statut</span>
+                    <span class="badge" th:classappend="|statut-${stage.statut.name()}|"
+                          th:text="${stage.statut.label}">Statut</span>
+                </div>
+                <div class="col-md-4">
+                    <span class="text-muted small d-block">Enseignant encadrant</span>
+                    <a th:if="${stage.etudiant != null and stage.etudiant.encadrant != null}"
+                       th:href="@{/enseignants/{id}(id=${stage.etudiant.encadrant.id})}"
+                       th:text="${stage.etudiant.encadrant.nomComplet}">Encadrant</a>
+                    <span th:if="${stage.etudiant == null or stage.etudiant.encadrant == null}"
+                          class="text-muted">Non affecte</span>
+                </div>
+                <div class="col-12" th:if="${stage.description}">
+                    <span class="text-muted small d-block">Description</span>
+                    <span th:text="${stage.description}">Description</span>
+                </div>
+                <div class="col-12" th:if="${not #lists.isEmpty(stage.declarations)}">
+                    <span class="text-muted small d-block">Dernier avancement declare par l'etudiant</span>
+                    <span class="fw-semibold" th:text="|${stage.declarations[0].pourcentage}%|">0%</span>
+                    <span class="text-muted small"
+                          th:text="|(${stage.declarations[0].dateDeclaration})|"></span>
+                </div>
+                <div class="col-12" th:if="${#lists.isEmpty(stage.declarations)}">
+                    <span class="text-muted small">Aucun avancement declare par l'etudiant.</span>
+                </div>
+                <div class="col-12">
+                    <div class="d-flex justify-content-between small text-muted mb-1">
+                        <span>Avancement des etapes</span>
+                        <span th:text="|${stage.avancement}%|">0%</span>
+                    </div>
+                    <div class="progress" style="height: 10px;">
+                        <div class="progress-bar" th:style="|width: ${stage.avancement}%|"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= Reunions + observations ================= -->
+    <div class="row g-4 mb-4">
+
+        <div class="col-lg-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                    <span class="fw-semibold">Reunions de suivi</span>
+                    <span class="badge text-bg-secondary" th:text="${stage.reunions.size()}">0</span>
+                </div>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item" th:each="r : ${stage.reunions}">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <strong th:text="${r.objet}">Objet</strong>
+                            <span class="d-flex align-items-center gap-2">
+                                <small class="text-muted" th:text="${r.dateReunion}">date</small>
+                                <form method="post"
+                                      th:action="@{/stages/{id}/reunions/{reunionId}/delete(id=${stage.id}, reunionId=${r.id})}"
+                                      onsubmit="return confirm('Supprimer cette reunion ?');">
+                                    <button class="btn btn-sm btn-outline-danger py-0 px-1">Supprimer</button>
+                                </form>
+                            </span>
+                        </div>
+                        <p class="mb-0 small text-muted" th:text="${r.compteRendu}">Compte rendu</p>
+                    </li>
+                    <li class="list-group-item text-muted small" th:if="${#lists.isEmpty(stage.reunions)}">
+                        Aucune reunion enregistree.
+                    </li>
+                </ul>
+                <div class="card-body border-top">
+                    <form method="post" th:action="@{/stages/{id}/reunions(id=${stage.id})}"
+                          th:object="${reunion}">
+                        <div class="row g-2">
+                            <div class="col-sm-5">
+                                <input class="form-control form-control-sm" type="date"
+                                       th:field="*{dateReunion}" required>
+                            </div>
+                            <div class="col-sm-7">
+                                <input class="form-control form-control-sm" type="text"
+                                       th:field="*{objet}" placeholder="Objet" required>
+                            </div>
+                            <div class="col-12">
+                                <textarea class="form-control form-control-sm" rows="2"
+                                          th:field="*{compteRendu}" placeholder="Compte rendu"></textarea>
+                            </div>
+                            <div class="col-12">
+                                <button class="btn btn-sm btn-primary">Ajouter la reunion</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                    <span class="fw-semibold">Observations et recommandations</span>
+                    <span class="badge text-bg-secondary" th:text="${stage.observations.size()}">0</span>
+                </div>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item" th:each="o : ${stage.observations}">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="badge"
+                                  th:classappend="${o.type.name() == 'RECOMMANDATION'} ? 'text-bg-info' : 'text-bg-secondary'"
+                                  th:text="${o.type.label}">Type</span>
+                            <small class="text-muted" th:text="${o.dateObservation}">date</small>
+                        </div>
+                        <p class="mb-0 mt-1" th:text="${o.contenu}">Contenu</p>
+                        <small class="text-muted"
+                               th:if="${o.auteur != null}"
+                               th:text="|Par ${o.auteur.nomComplet}|">Par</small>
+                    </li>
+                    <li class="list-group-item text-muted small" th:if="${#lists.isEmpty(stage.observations)}">
+                        Aucune observation enregistree.
+                    </li>
+                </ul>
+                <div class="card-body border-top">
+                    <form method="post" th:action="@{/stages/{id}/observations(id=${stage.id})}"
+                          th:object="${observation}">
+                        <div class="row g-2">
+                            <div class="col-sm-5">
+                                <input class="form-control form-control-sm" type="date"
+                                       th:field="*{dateObservation}" required>
+                            </div>
+                            <div class="col-sm-7">
+                                <select class="form-select form-select-sm" th:field="*{type}">
+                                    <option th:each="t : ${typesObservation}" th:value="${t}"
+                                            th:text="${t.label}"></option>
+                                </select>
+                            </div>
+                            <div class="col-12">
+                                <textarea class="form-control form-control-sm" rows="2"
+                                          th:field="*{contenu}" placeholder="Votre observation" required></textarea>
+                            </div>
+                            <div class="col-sm-7">
+                                <select class="form-select form-select-sm" name="auteurId">
+                                    <option value="">-- Auteur --</option>
+                                    <option th:each="ens : ${enseignants}" th:value="${ens.id}"
+                                            th:text="${ens.nomComplet}"
+                                            th:selected="${stage.etudiant != null
+                                                and stage.etudiant.encadrant != null
+                                                and stage.etudiant.encadrant.id == ens.id}">
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="col-sm-5">
+                                <button class="btn btn-sm btn-primary w-100">Ajouter</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= Etapes de progression ================= -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+            <span class="fw-semibold">Etapes de progression</span>
+            <span class="badge text-bg-secondary" th:text="${stage.etapes.size()}">0</span>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-sm align-middle mb-0">
+                <thead class="table-light">
+                <tr>
+                    <th style="width: 50px;">#</th>
+                    <th>Titre</th>
+                    <th>Description</th>
+                    <th>Statut</th>
+                    <th>Validation</th>
+                    <th class="text-end">Action</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="etape : ${stage.etapes}">
+                    <td th:text="${etape.ordre}">1</td>
+                    <td th:text="${etape.titre}">Titre</td>
+                    <td class="text-muted small" th:text="${etape.description}">Description</td>
+                    <td>
+                        <span class="badge" th:classappend="|etape-${etape.statut.name()}|"
+                              th:text="${etape.statut.label}">A faire</span>
+                    </td>
+                    <td class="small">
+                        <span th:if="${etape.dateValidation != null}"
+                              th:text="|${etape.dateValidation} - ${etape.valideePar != null ? etape.valideePar.nomComplet : ''}|">
+                            date
+                        </span>
+                        <span th:if="${etape.dateValidation == null}" class="text-muted">&mdash;</span>
+                    </td>
+                    <td class="text-end">
+                        <span th:if="${etape.statut.name() == 'VALIDEE'}"
+                              class="badge text-bg-success">Validee</span>
+                        <form th:if="${etape.statut.name() != 'VALIDEE'}"
+                              class="d-flex gap-1 justify-content-end"
+                              method="post"
+                              th:action="@{/stages/{id}/etapes/{etapeId}/valider(id=${stage.id}, etapeId=${etape.id})}">
+                            <select class="form-select form-select-sm" name="enseignantId" required
+                                    style="max-width: 160px;">
+                                <option value="">Validateur</option>
+                                <option th:each="ens : ${enseignants}" th:value="${ens.id}"
+                                        th:text="${ens.nomComplet}"
+                                        th:selected="${stage.etudiant != null
+                                            and stage.etudiant.encadrant != null
+                                            and stage.etudiant.encadrant.id == ens.id}">
+                                </option>
+                            </select>
+                            <button class="btn btn-sm btn-success">Valider</button>
+                        </form>
+                    </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(stage.etapes)}">
+                    <td colspan="6" class="text-center text-muted py-3">Aucune etape definie.</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="card-body border-top">
+            <form method="post" th:action="@{/stages/{id}/etapes(id=${stage.id})}" th:object="${etape}">
+                <div class="row g-2">
+                    <div class="col-sm-5">
+                        <input class="form-control form-control-sm" type="text"
+                               th:field="*{titre}" placeholder="Titre de l'etape" required>
+                    </div>
+                    <div class="col-sm-2">
+                        <input class="form-control form-control-sm" type="number" min="1"
+                               th:field="*{ordre}" placeholder="Ordre">
+                    </div>
+                    <div class="col-sm-5">
+                        <input class="form-control form-control-sm" type="text"
+                               th:field="*{description}" placeholder="Description">
+                    </div>
+                    <div class="col-12">
+                        <button class="btn btn-sm btn-primary">Ajouter l'etape</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ================= Livrables ================= -->
+    <div class="card shadow-sm">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+            <span class="fw-semibold">Livrables deposes par l'etudiant</span>
+            <span class="badge text-bg-secondary" th:text="${stage.livrables.size()}">0</span>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-sm align-middle mb-0">
+                <thead class="table-light">
+                <tr><th>Titre</th><th>Lien</th><th>Description</th><th>Depot</th></tr>
+                </thead>
+                <tbody>
+                <tr th:each="l : ${stage.livrables}">
+                    <td th:text="${l.titre}">Titre</td>
+                    <td>
+                        <a th:if="${l.url != null and !l.url.isEmpty()}" th:href="${l.url}"
+                           target="_blank" th:text="${l.url}">url</a>
+                        <span th:if="${l.url == null or l.url.isEmpty()}" class="text-muted">&mdash;</span>
+                    </td>
+                    <td class="text-muted small" th:text="${l.description}">Description</td>
+                    <td class="small" th:text="${l.dateDepot}">date</td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(stage.livrables)}">
+                    <td colspan="4" class="text-center text-muted py-3">Aucun livrable depose.</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="card-body border-top">
+            <form method="post" th:action="@{/stages/{id}/livrables(id=${stage.id})}" th:object="${livrable}">
+                <div class="row g-2">
+                    <div class="col-sm-4">
+                        <input class="form-control form-control-sm" type="text"
+                               th:field="*{titre}" placeholder="Titre du livrable" required>
+                    </div>
+                    <div class="col-sm-5">
+                        <input class="form-control form-control-sm" type="url"
+                               th:field="*{url}" placeholder="https://...">
+                    </div>
+                    <div class="col-sm-3">
+                        <input class="form-control form-control-sm" type="date"
+                               th:field="*{dateDepot}">
+                    </div>
+                    <div class="col-12">
+                        <input class="form-control form-control-sm" type="text"
+                               th:field="*{description}" placeholder="Description">
+                    </div>
+                    <div class="col-12">
+                        <button class="btn btn-sm btn-primary">Deposer le livrable</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</div>
+</body>
+</html>

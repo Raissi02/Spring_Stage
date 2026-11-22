@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}"
+      lang="fr">
+<head>
+    <title>Fiche entreprise</title>
+</head>
+<body>
+<div layout:fragment="content">
+
+    <h1 class="h3 mb-3"
+        th:text="${entreprise.id == null} ? 'Nouvelle entreprise' : 'Modifier une entreprise'">Entreprise</h1>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <form method="post"
+                  th:action="${entreprise.id == null} ? @{/entreprises} : @{/entreprises/{id}(id=${entreprise.id})}"
+                  th:object="${entreprise}">
+
+                <div class="row g-3">
+                    <div class="col-md-8">
+                        <label class="form-label" for="raisonSociale">Raison sociale</label>
+                        <input class="form-control" id="raisonSociale" type="text"
+                               th:field="*{raisonSociale}">
+                        <div class="text-danger small" th:errors="*{raisonSociale}"></div>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label" for="secteur">Secteur</label>
+                        <input class="form-control" id="secteur" type="text" th:field="*{secteur}">
+                        <div class="text-danger small" th:errors="*{secteur}"></div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label" for="contactNom">Nom du contact</label>
+                        <input class="form-control" id="contactNom" type="text" th:field="*{contactNom}">
+                        <div class="text-danger small" th:errors="*{contactNom}"></div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label" for="telephone">Telephone</label>
+                        <input class="form-control" id="telephone" type="text" th:field="*{telephone}">
+                        <div class="text-danger small" th:errors="*{telephone}"></div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label" for="email">Email</label>
+                        <input class="form-control" id="email" type="email" th:field="*{email}">
+                        <div class="text-danger small" th:errors="*{email}"></div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label" for="adresse">Adresse</label>
+                        <input class="form-control" id="adresse" type="text" th:field="*{adresse}">
+                        <div class="text-danger small" th:errors="*{adresse}"></div>
+                    </div>
+                </div>
+
+                <div class="mt-4 d-flex gap-2">
+                    <button class="btn btn-primary" type="submit">Enregistrer</button>
+                    <a class="btn btn-outline-secondary" th:href="@{/entreprises}">Annuler</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</div>
+</body>
+</html>

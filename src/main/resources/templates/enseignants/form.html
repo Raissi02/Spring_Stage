@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}"
+      lang="fr">
+<head>
+    <title>Fiche enseignant</title>
+</head>
+<body>
+<div layout:fragment="content">
+
+    <h1 class="h3 mb-3"
+        th:text="${enseignant.id == null} ? 'Nouvel enseignant' : 'Modifier un enseignant'">Enseignant</h1>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <form method="post"
+                  th:action="${enseignant.id == null} ? @{/enseignants} : @{/enseignants/{id}(id=${enseignant.id})}"
+                  th:object="${enseignant}">
+
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label" for="nom">Nom</label>
+                        <input class="form-control" id="nom" type="text" th:field="*{nom}">
+                        <div class="text-danger small" th:errors="*{nom}"></div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label" for="prenom">Prenom</label>
+                        <input class="form-control" id="prenom" type="text" th:field="*{prenom}">
+                        <div class="text-danger small" th:errors="*{prenom}"></div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label" for="email">Email</label>
+                        <input class="form-control" id="email" type="email" th:field="*{email}">
+                        <div class="text-danger small" th:errors="*{email}"></div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label" for="telephone">Telephone</label>
+                        <input class="form-control" id="telephone" type="text" th:field="*{telephone}">
+                        <div class="text-danger small" th:errors="*{telephone}"></div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label" for="grade">Grade</label>
+                        <input class="form-control" id="grade" type="text" th:field="*{grade}">
+                        <div class="text-danger small" th:errors="*{grade}"></div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label" for="specialite">Specialite</label>
+                        <input class="form-control" id="specialite" type="text" th:field="*{specialite}">
+                        <div class="text-danger small" th:errors="*{specialite}"></div>
+                    </div>
+                </div>
+
+                <div class="mt-4 d-flex gap-2">
+                    <button class="btn btn-primary" type="submit">Enregistrer</button>
+                    <a class="btn btn-outline-secondary" th:href="@{/enseignants}">Annuler</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</div>
+</body>
+</html>

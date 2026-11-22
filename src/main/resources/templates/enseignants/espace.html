@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}"
+      lang="fr">
+<head>
+    <title>Espace enseignant</title>
+</head>
+<body>
+<div layout:fragment="content">
+
+    <div class="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-3">
+        <div>
+            <span class="badge text-bg-primary mb-1">Espace enseignant</span>
+            <h1 class="h3 mb-1" th:text="${enseignant.nomComplet}">Enseignant</h1>
+            <div class="text-muted">
+                <span th:text="${enseignant.grade}">Grade</span>
+                <span th:if="${enseignant.specialite != null}"
+                      th:text="| - ${enseignant.specialite}|"></span>
+            </div>
+        </div>
+        <div class="d-flex gap-2">
+            <a class="btn btn-outline-secondary" th:href="@{/enseignant}">Changer d'enseignant</a>
+            <a class="btn btn-outline-secondary" th:href="@{/}">Accueil</a>
+        </div>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-lg-3">
+            <div class="card shadow-sm h-100 stat-card">
+                <div class="card-body">
+                    <div class="text-muted text-uppercase small">Mes etudiants</div>
+                    <div class="display-6" th:text="${nbEtudiants}">0</div>
+                    <div class="small text-muted">
+                        dont <span th:text="${nbSansStage}">0</span> sans stage
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="card shadow-sm h-100 stat-card">
+                <div class="card-body">
+                    <div class="text-muted text-uppercase small">Stages en cours</div>
+                    <div class="display-6" th:text="${nbStagesEnCours}">0</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="card shadow-sm h-100 stat-card">
+                <div class="card-body">
+                    <div class="text-muted text-uppercase small">Etapes a valider</div>
+                    <div class="display-6" th:text="${etapesAValider.size()}">0</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="card shadow-sm h-100 stat-card">
+                <div class="card-body">
+                    <div class="text-muted text-uppercase small">Reunions de suivi</div>
+                    <div class="display-6" th:text="${nbReunions}">0</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-white fw-semibold">Etudiants affectes</div>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                <tr>
+                    <th>Etudiant</th>
+                    <th>Filiere / niveau</th>
+                    <th>Stage</th>
+                    <th>Entreprise</th>
+                    <th>Statut</th>
+                    <th>Avancement</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="e : ${etudiants}">
+                    <td th:text="${e.nomComplet}">Etudiant</td>
+                    <td th:text="|${e.filiere} / ${e.niveau}|">Filiere / niveau</td>
+                    <td>
+                        <span th:if="${e.stage != null}" th:text="${e.stage.sujet}">Stage</span>
+                        <span th:if="${e.stage == null}" class="text-muted">Aucun stage</span>
+                    </td>
+                    <td th:text="${e.stage != null ? e.stage.entreprise.raisonSociale : '-'}">Entreprise</td>
+                    <td>
+                        <span th:if="${e.stage != null}" class="badge"
+                              th:classappend="|statut-${e.stage.statut.name()}|"
+                              th:text="${e.stage.statut.label}">Statut</span>
+                        <span th:if="${e.stage == null}" class="text-muted">&mdash;</span>
+                    </td>
+                    <td th:text="${e.stage != null ? e.stage.avancement + '%' : '-'}">0%</td>
+                    <td class="text-end text-nowrap">
+                        <a class="btn btn-sm btn-outline-success"
+                           th:href="@{/etudiants/{id}(id=${e.id})}">Espace etudiant</a>
+                        <a th:if="${e.stage != null}" class="btn btn-sm btn-primary"
+                           th:href="@{/stages/{id}(id=${e.stage.id})}">Suivi du stage</a>
+                    </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(etudiants)}">
+                    <td colspan="7" class="text-center text-muted py-4">
+                        Aucun etudiant ne vous est affecte pour le moment.
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+            <span class="fw-semibold">Etapes de progression a valider</span>
+            <span class="badge text-bg-secondary" th:text="${etapesAValider.size()}">0</span>
+        </div>
+        <div class="table-responsive" th:if="${not #lists.isEmpty(etapesAValider)}">
+            <table class="table table-sm align-middle mb-0">
+                <thead class="table-light">
+                <tr>
+                    <th>Etudiant</th>
+                    <th>Stage</th>
+                    <th>Etape</th>
+                    <th>Statut</th>
+                    <th class="text-end">Action</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="etape : ${etapesAValider}">
+                    <td th:text="${etape.stage.etudiant.nomComplet}">Etudiant</td>
+                    <td th:text="${etape.stage.sujet}">Stage</td>
+                    <td th:text="${etape.titre}">Etape</td>
+                    <td>
+                        <span class="badge" th:classappend="|etape-${etape.statut.name()}|"
+                              th:text="${etape.statut.label}">Statut</span>
+                    </td>
+                    <td class="text-end">
+                        <a class="btn btn-sm btn-primary"
+                           th:href="@{/stages/{id}(id=${etape.stage.id})}">Valider dans le suivi</a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="card-body text-muted" th:if="${#lists.isEmpty(etapesAValider)}">
+            Toutes les etapes de vos etudiants sont validees.
+        </div>
+    </div>
+
+    <p class="text-muted small mt-3 mb-0">
+        Les reunions, observations et validations se gerent depuis la page
+        "Suivi du stage" de chaque etudiant.
+    </p>
+
+</div>
+</body>
+</html>
